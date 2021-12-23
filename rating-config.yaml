@@ -13,58 +13,89 @@ spec:
 apiVersion: cicd.tmax.io/v1
 kind: IntegrationConfig
 metadata:
-  name: bookinfo-rating-config
+  name: bookinfo-rating-config-test
 spec:
   git:
     type: github
-    apiUrl: 
-    repository: tmax-cloud/bookinfo-rating
+    apiUrl: ""
+    repository: changju-test/bookinfo-rating
     token:
       valueFrom:
         secretKeyRef:
-          name: yxzzzxh-git-token
+          name: git-token
           key: token
   workspaces:
     - name : rating-workspace
       persistentVolumeClaim:
         claimName: rating-pvc
+    - name: sonar-settings
+      configMap:
+        name: sonar-properties
   secrets:
     - name : tmaxcloudck-docker-hub-secret
   jobs:
     postSubmit:
-      - name: gradle-package
-        image: docker.io/gradle:7.3.1-jdk11
-        script: |
-          gradle build
-          cp build/libs/$JAR_NAME $(workspaces.rating-workspace.path)/$JAR_NAME
+      # - name: clone
+      #   image: docker.io/alpine:3.13.6
+      #   script: |
+      #     cp -r . $(workspaces.rating-workspace.path)
+      # - name: gradle-package
+      #   image: docker.io/gradle:7.3.1-jdk11
+      #   script: |
+      #     gradle build
+      #     ls
+      #     cp -r build $(workspaces.rating-workspace.path)/build
+      # - name: code-analysis
+      #   tektonTask:
+      #     taskRef:
+      #       local:
+      #         name: sonarqube-scanner
+      #         kind: Task
+      #     params:
+      #     - name: SONAR_HOST_URL
+      #       stringVal: http://sonarqube.172.22.11.16.nip.io
+      #     - name: SONAR_PROJECT_KEY
+      #       stringVal: sonar-test
+      #     workspaces:
+      #     - name: source-dir
+      #       workspace: rating-workspace
+      #     - name: sonar-settings
+      #       workspace: sonar-settings
+      #   after:
+      #   - clone
+      #   - gradle-package
+      - name: s2i-gradle-generate
+        image: docker.io/tmaxcloudck/cicd-util:5.0.5
         env: 
           - name: JAR_NAME
             value : rating.jar
-        when:
-          tag:
-            - v.*
+        script: |
+          /usr/local/bin/s2i \
+          build . docker.io/changjjjjjjjj/s2i-gradle-java:dev \
+          --env JAR_NAME=$JAR_NAME \
+          --tlsverify=false \
+          --as-dockerfile $(workspaces.rating-workspace.path)/Dockerfile.gen
       - name: build-and-push
         image: quay.io/buildah/stable
         script: |
           IMG_TAG=${CI_HEAD_REF#refs/tags/}
 
-          cp $(workspaces.rating-workspace.path)/$JAR_NAME ./
-          buildah bud --tls-verify=false --storage-driver=vfs --format docker -f Dockerfile -t $IMG_URL:$IMG_TAG .
-          buildah login --tls-verify=false -u $HARBOR_USER -p $HARBOR_PASS core.hr.172.22.11.16.nip.io
-          buildah push --tls-verify=false --storage-driver=vfs $IMG_URL:$IMG_TAG docker://$IMG_URL:$IMG_TAG
+          buildah bud --tls-verify=false --storage-driver=vfs --format docker -f $(workspaces.rating-workspace.path)/Dockerfile.gen -t $REGISTRY_URL/$IMG_PATH:$IMG_TAG $(workspaces.rating-workspace.path)
+          buildah login --tls-verify=false -u $REG_USER -p $REG_PASS $REGISTRY_URL
+          buildah push --tls-verify=false --storage-driver=vfs $REGISTRY_URL/$IMG_PATH:$IMG_TAG docker://$REGISTRY_URL/$IMG_PATH:$IMG_TAG
         env:
-          - name: IMG_URL
-            value: core.hr.172.22.11.16.nip.io/shinhan-bookinfo/bookinfo-rating
-          - name: JAR_NAME
-            value: rating.jar
-          - name: HARBOR_USER
+          - name: REGISTRY_URL
+            value: core.hr.172.22.11.16.nip.io
+          - name: IMG_PATH
+            value: shinhan-bookinfo/bookinfo-rating
+          - name: REG_USER
             value: admin
-          - name: HARBOR_PASS
+          - name: REG_PASS
             value: admin
         securityContext:
           privileged: true
         after:
-          - gradle-package
+          - s2i-gradle-generate
         when:
           tag:
             - v.*
