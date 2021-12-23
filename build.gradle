@@ -1,65 +1,66 @@
-plugins {
-    id 'org.springframework.boot' version '2.6.1'
-    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
-    id 'java'
-    id 'org.sonarqube' version '3.3'
-}
+// plugins {
+//     id 'org.springframework.boot' version '2.6.1'
+//     id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+//     id 'java'
+//     id 'org.sonarqube' version '3.3'
+// }
 
-group = 'com.tmaxcloud.sample.msa.book'
-version = '0.0.1-SNAPSHOT'
+// group = 'com.tmaxcloud.sample.msa.book'
+// version = '0.0.1-SNAPSHOT'
 
-configurations {
-    compileOnly {
-        extendsFrom annotationProcessor
-    }
-}
+// configurations {
+//     compileOnly {
+//         extendsFrom annotationProcessor
+//     }
+// }
 
-sonarqube {
-    properties {
-        property "sonar.host.url", "http://sonarqube.172.22.11.16.nip.io"
-        property "sonar.sourceEncoding", "UTF-8"
-        property "sonar.login", "admin"
-        property "sonar.password", "tmax@23"
-        property "sonar.projectKey", "rating-sonar"
-        property "sonar.sources", "src/"
-    }
-}
+// sonarqube {
+//     properties {
+//         property "sonar.host.url", "http://sonarqube.172.22.11.16.nip.io"
+//         property "sonar.sourceEncoding", "UTF-8"
+//         property "sonar.login", "admin"
+//         property "sonar.password", "tmax@23"
+//         property "sonar.projectKey", "rating-sonar"
+//         property "sonar.sources", "src/"
+//         property "sonar.language", "java"
+//     }
+// }
 
-repositories {
-    maven {
-        url "http://172.22.11.2:32428/repository/maven-public/"
-        allowInsecureProtocol = true
-		credentials {
-    		username= 'admin'
-    		password= '123'
-		}
-    }
-    mavenCentral()
-}
+// repositories {
+//     maven {
+//         url "http://172.22.11.2:32428/repository/maven-public/"
+//         allowInsecureProtocol = true
+// 		credentials {
+//     		username= 'admin'
+//     		password= '123'
+// 		}
+//     }
+//     mavenCentral()
+// }
 
-dependencies {
-    compileOnly 'org.projectlombok:lombok'
-    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+// dependencies {
+//     compileOnly 'org.projectlombok:lombok'
+//     developmentOnly 'org.springframework.boot:spring-boot-devtools'
 
-    annotationProcessor 'org.projectlombok:lombok'
-    annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+//     annotationProcessor 'org.projectlombok:lombok'
+//     annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
 
-    implementation 'org.springframework.boot:spring-boot-starter-data-jdbc'
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-    implementation 'org.springframework.boot:spring-boot-starter-web'
-    implementation 'org.springframework.boot:spring-boot-starter-actuator'
-    implementation 'io.opentracing.contrib:opentracing-spring-jaeger-cloud-starter:3.3.1'
-    implementation 'org.modelmapper:modelmapper:2.3.5'
+//     implementation 'org.springframework.boot:spring-boot-starter-data-jdbc'
+//     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+//     implementation 'org.springframework.boot:spring-boot-starter-web'
+//     implementation 'org.springframework.boot:spring-boot-starter-actuator'
+//     implementation 'io.opentracing.contrib:opentracing-spring-jaeger-cloud-starter:3.3.1'
+//     implementation 'org.modelmapper:modelmapper:2.3.5'
 
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+//     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
-    runtimeOnly 'org.postgresql:postgresql'
-}
+//     runtimeOnly 'org.postgresql:postgresql'
+// }
 
-test {
-//    useJUnitPlatform()
-}
+// test {
+// //    useJUnitPlatform()
+// }
 
-bootJar {
-    archiveFileName.set("rating.jar")
-}
+// bootJar {
+//     archiveFileName.set("rating.jar")
+// }
