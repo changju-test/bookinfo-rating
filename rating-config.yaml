@@ -71,19 +71,19 @@ spec:
       - name: copy-source
         image: docker.io/alpine:3.13.6
         script: |
-          cp -r $(workspaces.rating-workspace.path)/git-clone ./src
+          cp -r $(workspaces.rating-workspace.path)/git-clone ./
           ls -al
         skipCheckout: true
         after:
           - git-clone
-      - name: s2i-gradle-generate
-        image: docker.io/tmaxcloudck/cicd-util:5.0.5
-        env: 
-          - name: JAR_NAME
-            value : rating.jar
-        script: |
-          /usr/local/bin/s2i \
-          build . docker.io/changjjjjjjjj/s2i-gradle-java:dev \
-          --env JAR_NAME=$JAR_NAME \
-          --tlsverify=false \
-        skipCheckout: true
+#      - name: s2i-gradle-generate
+#        image: docker.io/tmaxcloudck/cicd-util:5.0.5
+#        env:
+#          - name: JAR_NAME
+#            value : rating.jar
+#        script: |
+#          /usr/local/bin/s2i \
+#          build . docker.io/changjjjjjjjj/s2i-gradle-java:dev \
+#          --env JAR_NAME=$JAR_NAME \
+#          --tlsverify=false \
+#        skipCheckout: true
