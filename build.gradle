@@ -64,7 +64,7 @@ dependencies {
 
 test {
 //    useJUnitPlatform()
-//test
+//test1
 }
 
 bootJar {
