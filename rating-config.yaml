@@ -32,14 +32,50 @@ spec:
     - name : tmaxcloudck-docker-hub-secret
   jobs:
     postSubmit:
-      - name: copy-source
-          image: docker.io/alpine:3.13.6
-          script: |
-            cp -r ./src $(workspaces.rating-workspace.path)/src
-          when:
-            branch:
-              - main
+      - name: git-clone
+        image: docker.io/alpine:3.13.6
+        script: |
+          set -x
+          set -e
+
+          git config --global user.email "bot@cicd.tmax.io"
+          git config --global user.name "tmax-cicd-bot"
+          git init
+
+          CHECKOUT_URL="$CI_SERVER_URL/$CI_REPOSITORY"
+          CI_HEAD_REF_ARRAY="$CI_HEAD_REF"
+
+          if [ "$CI_BASE_REF" = "" ]; then 
+            # Push Event
+            CHECKOUT_REF="$CI_HEAD_REF"
+          else 
+            # Pull Request Event
+            CHECKOUT_REF="$CI_BASE_REF"
+          fi
+
+          git fetch "$CHECKOUT_URL" "$CHECKOUT_REF"
+          git checkout FETCH_HEAD
+
+          if [ "$CI_BASE_REF" != "" ]; then
+            # Pull request event
+            for ci_head_ref in $CI_HEAD_REF_ARRAY; do 
+              git fetch "$CHECKOUT_URL" "$ci_head_ref"
+              git merge --no-ff FETCH_HEAD
+            done
+          fi
+
+          git submodule update --init --recursive
+          
+          cp -r ./ $(workspaces.rating-workspaces.path)/git-clone
         skipCheckout: true
+      - name: copy-source
+        image: docker.io/alpine:3.13.6
+        script: |
+          cp -r $(workspaces.rating-workspace.path)/git-clone ./src
+          ls -al
+        skipCheckout: true
+        after:
+          - git-clone
       - name: s2i-gradle-generate
         image: docker.io/tmaxcloudck/cicd-util:5.0.5
         env: 
