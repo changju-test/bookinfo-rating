@@ -72,7 +72,7 @@ spec:
         image: docker.io/alpine:3.13.6
         script: |
           cp -r $(workspaces.rating-workspace.path)/git-clone ./
-          ls -al
+          ls ./git-clone -al
         skipCheckout: true
         after:
           - git-clone
