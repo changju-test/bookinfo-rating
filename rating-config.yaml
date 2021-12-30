@@ -33,7 +33,7 @@ spec:
   jobs:
     postSubmit:
       - name: git-clone
-        image: docker.io/alpine:3.13.6
+        image: docker.io/alpine/git
         script: |
           set -x
           set -e
