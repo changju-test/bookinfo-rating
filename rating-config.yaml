@@ -66,7 +66,7 @@ spec:
 
           git submodule update --init --recursive
           
-          cp -r ./ $(workspaces.rating-workspaces.path)/git-clone
+          cp -r ./ $(workspaces.rating-workspace.path)/git-clone
         skipCheckout: true
       - name: copy-source
         image: docker.io/alpine:3.13.6
