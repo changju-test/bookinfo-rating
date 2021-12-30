@@ -32,6 +32,14 @@ spec:
     - name : tmaxcloudck-docker-hub-secret
   jobs:
     postSubmit:
+      - name: copy-source
+          image: docker.io/alpine:3.13.6
+          script: |
+            cp -r ./src $(workspaces.rating-workspace.path)/src
+          when:
+            branch:
+              - main
+        skipCheckout: true
       - name: s2i-gradle-generate
         image: docker.io/tmaxcloudck/cicd-util:5.0.5
         env: 
@@ -42,4 +50,4 @@ spec:
           build . docker.io/changjjjjjjjj/s2i-gradle-java:dev \
           --env JAR_NAME=$JAR_NAME \
           --tlsverify=false \
-          --as-dockerfile $(workspaces.rating-workspace.path)/Dockerfile.gen
+        skipCheckout: true
