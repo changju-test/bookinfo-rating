@@ -2,6 +2,7 @@ plugins {
     id 'org.springframework.boot' version '2.6.1'
     id 'io.spring.dependency-management' version '1.0.11.RELEASE'
     id 'java'
+    id 'maven-publish'
     id 'org.sonarqube' version '3.3'
 }
 
@@ -31,16 +32,25 @@ sonarqube {
     }
 }
 
-repositories {
-    maven {
-        url "http://172.22.11.2:32428/repository/maven-public/"
-        allowInsecureProtocol = true
-		credentials {
-    		username= 'admin'
-    		password= '123'
-		}
+publishing {
+    publications {
+        bookLibrary(MavenPublication) {
+            groupId = 'org.tmaxcloud.sample.msa.book'
+            artifactId = 'rating-test'
+            version = '0.0.3'
+            from components.java
+        }
     }
-    mavenCentral()
+    repositories {
+        maven {
+            url "http://172.22.11.2:32428/repository/maven-releases/"
+            allowInsecureProtocol = true
+            credentials {
+                username= 'admin'
+                password= '123'
+            }
+        }
+    }
 }
 
 dependencies {
