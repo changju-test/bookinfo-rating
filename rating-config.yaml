@@ -13,28 +13,49 @@ spec:
 apiVersion: cicd.tmax.io/v1
 kind: IntegrationConfig
 metadata:
-  name: bookinfo-rating-config-test
+  name: bookinfo-rating-config
 spec:
   git:
     type: github
-    apiUrl: ""
+    apiUrl:
     repository: changju-test/bookinfo-rating
     token:
       valueFrom:
         secretKeyRef:
-          name: git-token
+          name: cj-git-token
           key: token
   workspaces:
     - name : rating-workspace
       persistentVolumeClaim:
         claimName: rating-pvc
-  secrets:
-    - name : tmaxcloudck-docker-hub-secret
   jobs:
     postSubmit:
-      - name: gradle-build-and-publish
+      - name: gradle-package
         image: docker.io/gradle:7.3.1-jdk11
         script: |
           gradle build
-          gradle sonarqube
-          gradle publish
+          cp build/libs/$JAR_NAME $(workspaces.rating-workspace.path)/$JAR_NAME
+        env:
+          - name: JAR_NAME
+            value : rating.jar
+      - name: build-and-push
+        image: quay.io/buildah/stable
+        script: |
+          IMG_TAG=${CI_HEAD_REF#refs/tags/}
+          cp $(workspaces.rating-workspace.path)/$JAR_NAME ./
+          buildah bud --tls-verify=false --storage-driver=vfs --format docker -f Dockerfile -t $IMG_URL:dev.
+          buildah login -u $HARBOR_USER -p $HARBOR_PASS
+          buildah push --tls-verify=false --storage-driver=vfs $IMG_URL:$IMG_TAG docker://$IMG_URL:dev
+        env:
+          - name: IMG_URL
+            value: docker.io/changjjjjjjjj/bookinfo-rating
+          - name: JAR_NAME
+            value: rating.jar
+          - name: HARBOR_USER
+            value: changjjjjjjjj
+          - name: HARBOR_PASS
+            value:
+        securityContext:
+          privileged: true
+        after:
+          - gradle-package
