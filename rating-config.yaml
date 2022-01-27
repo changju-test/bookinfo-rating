@@ -80,7 +80,7 @@ data:
   sonar-project.properties: "# required metdata\nsonar.projectKey=sonar-test\nsonar.login=admin\nsonar.projectVersion=0.1\nsonar.sourceEncoding=UTF-8\n
     sonar.password=tmax@23\nsonar.sources=src/main/java/\nsonar.language=java\nsonar.java.binaries=src/main/java"
 ---
-# test
+# testt
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
