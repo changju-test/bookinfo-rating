@@ -110,6 +110,9 @@ spec:
     - name : rating-workspace
       persistentVolumeClaim:
         claimName: rating-pvc
+    - name: sonar-settings
+      configMap:
+        name: sonar-properties
   jobs:
     postSubmit:
       - name: copy-source
