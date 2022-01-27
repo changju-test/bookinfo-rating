@@ -96,7 +96,7 @@ spec:
 apiVersion: cicd.tmax.io/v1
 kind: IntegrationConfig
 metadata:
-  name: bookinfo-rating-config
+  name: bookinfo-rating-config2
 spec:
   git:
     type: github
