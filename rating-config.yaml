@@ -123,5 +123,5 @@ spec:
         image: docker.io/bitnami/kubectl:latest
         script: |
           ls $(workspaces.kubeconfig.path)
-          cp $(workspaces.kubeconfig.path) /.kube/config
+          cp $(workspaces.kubeconfig.path)/kubeconfig /.kube/config
           kubectl apply -f release.yaml
