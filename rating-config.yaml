@@ -119,59 +119,9 @@ spec:
         secretName: kubeconfig
   jobs:
     postSubmit:
-      - name: copy-source
-        image: docker.io/alpine:3.13.6
-        script: |
-          cp -r ./src $(workspaces.rating-workspace.path)/src
-      - name: code-analysis
-        tektonTask:
-          taskRef:
-            local:
-              name: sonarqube-scanner
-              kind: Task
-          params:
-            - name: SONAR_HOST_URL
-              stringVal: http://sonarqube.172.22.11.16.nip.io
-            - name: SONAR_PROJECT_KEY
-              stringVal: rating-sonar
-          workspaces:
-            - name: source-dir
-              workspace: rating-workspace
-            - name: sonar-settings
-              workspace: sonar-settings
-        after:
-          - copy-source
-      - name: gradle-package
-        image: docker.io/gradle:7.3.1-jdk11
-        script: |
-          gradle build
-          cp build/libs/$JAR_NAME $(workspaces.rating-workspace.path)/$JAR_NAME
-        env:
-          - name: JAR_NAME
-            value : rating.jar
-      - name: build-and-push
-        image: quay.io/buildah/stable
-        script: |
-          IMG_TAG=${CI_HEAD_REF#refs/tags/}
-          cp $(workspaces.rating-workspace.path)/$JAR_NAME ./
-          buildah bud --tls-verify=false --storage-driver=vfs --format docker -f Dockerfile -t $IMG_URL:dev.
-          buildah login -u $HARBOR_USER -p $HARBOR_PASS
-          buildah push --tls-verify=false --storage-driver=vfs $IMG_URL:$IMG_TAG docker://$IMG_URL:dev
-        env:
-          - name: IMG_URL
-            value: docker.io/changjjjjjjjj/bookinfo-rating
-          - name: JAR_NAME
-            value: rating.jar
-          - name: HARBOR_USER
-            value: changjjjjjjjj
-          - name: HARBOR_PASS
-            value:
-        securityContext:
-          privileged: true
-        after:
-          - gradle-package
       - name: deploy
         image: docker.io/bitnami/kubectl:latest
         script: |
+          ls $(workspaces.kubeconfig.path)
           cp $(workspaces.kubeconfig.path) /.kube/config
           kubectl apply -f release.yaml
