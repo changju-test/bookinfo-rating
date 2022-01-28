@@ -96,7 +96,7 @@ spec:
 apiVersion: cicd.tmax.io/v1
 kind: IntegrationConfig
 metadata:
-  name: bookinfo-rating-config2
+  name: bookinfo-rating-config
 spec:
   git:
     type: github
@@ -114,6 +114,9 @@ spec:
     - name: sonar-settings
       configMap:
         name: sonar-properties
+    - name: kubeconfig
+      secret:
+        secretName: kubeconfig
   jobs:
     postSubmit:
       - name: copy-source
@@ -167,3 +170,8 @@ spec:
           privileged: true
         after:
           - gradle-package
+      - name: deploy
+        image: docker.io/bitnami/kubectl:latest
+        script: |
+          cp $(workspaces.kubeconfig.path) /.kube/config
+          kubectl apply -f release.yaml
