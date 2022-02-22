@@ -2,7 +2,7 @@ plugins {
     id 'org.springframework.boot' version '2.6.1'
     id 'io.spring.dependency-management' version '1.0.11.RELEASE'
     id 'java'
-    id 'maven-publish'
+
     id 'org.sonarqube' version '3.3'
 }
 
@@ -22,34 +22,18 @@ sonarqube {
         property "sonar.login", "admin"
         property "sonar.password", "tmax@23"
         property "sonar.projectKey", "rating-sonar"
-        property "sonar.language", "java"
-        property "sonar.sources", "src/main/java"
-        property "sonar.java.binaries", "build/classes/java/main"
-        property "sonar.java.libraries", "build/libs"
-        property "sonar.tests", "src/test"
-        property "sonar.java.test.binaries", "build/classes/java/test"
-        property "sonar.junit.reportPaths", "build/reports/tests"
     }
 }
 
-publishing {
-    publications {
-        bookLibrary(MavenPublication) {
-            groupId = 'org.tmaxcloud.sample.msa.book'
-            artifactId = 'rating-test'
-            version = '0.0.3'
-            from components.java
-        }
-    }
-    repositories {
-        maven {
-            url "http://172.22.11.2:32428/repository/maven-releases/"
-            allowInsecureProtocol = true
-            credentials {
-                username= 'admin'
-                password= '123'
-            }
-        }
+repositories {
+    maven {
+        url "http://172.22.11.2:32428/repository/maven-public/"
+        allowInsecureProtocol = true
+		credentials {
+    		username= 'admin'
+    		password= '123'
+		}
+
     }
 }
 
@@ -74,7 +58,6 @@ dependencies {
 
 test {
 //    useJUnitPlatform()
-//test1
 }
 
 bootJar {
